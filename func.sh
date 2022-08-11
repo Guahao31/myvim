@@ -2,7 +2,8 @@
 
 # 打印当前页
 print_page() {
-    curr_row=0
+    local curr_row=0
+    local one_line=""
     # IFS= 是为了避免字符串前后的空白符被截去
     while IFS= read -r one_line; do
         if [ $curr_row -ne $cur_pos_row ]; then
@@ -37,5 +38,35 @@ myvim_right() {
     if [ $cur_pos_col -lt ${#curr_line} ]; then
         # 最多允许到最大长度加一(即编辑行末)
         cur_pos_col=$((cur_pos_col+1))
+    fi
+}
+
+change_cur_col() {
+    # 处理上移或下移后的列坐标
+    # 需要一个参数；需要比较的列的内容
+    local next_line=$1
+    local next_line_len=${#next_line}
+    if [ $cur_pos_col -gt $next_line_len ]; then
+        # 如果当前的坐标大与下一行的总长度，则将坐标改为这一行的行末
+        cur_pos_col=${#next_line}
+    fi # 否则col坐标值不变
+}
+
+myvim_up() {
+    # 处理光标上移
+    if [ $cur_pos_row -gt 0 ]; then
+        local up_line=$(cat $temp_file | sed -n $((cur_pos_row))'p')
+        cur_pos_row=$((cur_pos_row-1))
+        change_cur_col $up_line
+    fi
+}
+
+myvim_down() {
+    # 处理光标下移
+    local file_lines=$(cat $temp_file | wc -l)
+    if [ $cur_pos_row -lt $((file_lines-1)) ]; then
+        local down_line=$(cat $temp_file | sed -n $((cur_pos_row+2))'p')
+        cur_pos_row=$((cur_pos_row+1))
+        change_cur_col $down_line
     fi
 }
