@@ -23,3 +23,19 @@ print_page() {
             ((++curr_row)) # 行数计数器自增1
     done < "$temp_file"
 }
+
+myvim_left() {
+    # 处理光标左移
+    if [ $cur_pos_col -gt 0 ]; then
+        # 如果目前光标并不在第一个位置，则将光标左移
+        cur_pos_col=$((cur_pos_col-1))
+    fi
+}
+
+myvim_right() {
+    # 处理光标右移
+    if [ $cur_pos_col -lt ${#curr_line} ]; then
+        # 最多允许到最大长度加一(即编辑行末)
+        cur_pos_col=$((cur_pos_col+1))
+    fi
+}

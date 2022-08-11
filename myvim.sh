@@ -40,21 +40,33 @@ tput civis # 取消终端光标的显示
 # 初始打印
 clear; print_page
 
+edit_mode=0 # 为0时表示正常模式，1为编辑模式
+
 # 主体部分，退出前一直循环，每次处理一个字符的输入
 while read -s -N1 input; do
     # -s 不将用户的输入反映到终端输出；-N1 每次读入1个字符
-    
-    # 清除屏幕并准备打印文件内容
-    clear # 清屏
-    print_page # 打印内容
 
     # 获得目前处理的行内容
     curr_line=$(cat $temp_file | sed -n $((curr_pos_row+1))'p')
-    
-    # 处理输入
-    modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$((cur_pos_col+1))}
-    sed -i $((cur_pos_row+1))'s/.*/'${modify_line}'/' ${temp_file}
-    cur_pos_col=$((cur_pos_col+1)) # 移动光标到下一个字符
+
+    if [ $edit_mode -eq 0 ]; then
+        # 正常模式
+        case $input in
+            j) myvim_left ;;
+            k) myvim_right ;;
+        esac
+    else
+        # 编辑模式
+        
+        # 处理输入
+        modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$cur_pos_col}
+        sed -i $((cur_pos_row+1))'s/.*/'${modify_line}'/' ${temp_file}
+        cur_pos_col=$((cur_pos_col+1)) # 移动光标到下一个字符
+    fi
+
+    # 清除屏幕并准备打印文件内容
+    clear # 清屏
+    print_page # 打印内容
 
 done
  
