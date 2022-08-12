@@ -47,6 +47,14 @@ main_part() {
     while read -s -N1 input; do
         # -s 不将用户的输入反映到终端输出；-N1 每次读入1个字符
 
+        # 参考 https://stackoverflow.com/questions/10679188/casing-arrow-keys-in-bash 中的回答
+        # 处理上下左右按键
+        # -t 指定获取多长时间内的下一个输入，用来组成上下左右键的esc后的部分
+        # 超过-t指定时间的读入并不会记录
+        read -s -N1 -t 0.0001 k1
+        read -s -N1 -t 0.0001 k2
+        input=${input}${k1}${k2}
+
         # 获得目前处理的行内容
         curr_line=$(cat $temp_file | sed -n $((cur_pos_row+1))'p')
 
@@ -63,15 +71,15 @@ main_part() {
                 # *)
             esac
         else
-            # # 编辑模式
-            # local modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$cur_pos_col}
-            # sed -i $((cur_pos_row+1))'s/.*/'${modify_line}'/' ${temp_file}
-            # cur_pos_col=$((cur_pos_col+1)) # 移动光标到下一个字符
             case $input in
                 $'\x1b') edit_mode=0    ;; # ESC，退出编辑模式
                 $'\x7f') # 回退键
 
                     ;;
+                $'\e[A'|$'\e0A') myvim_up   ;; # 上
+                $'\e[B'|$'\e0B') myvim_down ;; # 下
+                $'\e[C'|$'\e0C') myvim_right;; # 右
+                $'\e[D'|$'\e0D') myvim_left ;; # 左
                 *) # 其他输入
                     # 处理输入
                     local modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$cur_pos_col}
