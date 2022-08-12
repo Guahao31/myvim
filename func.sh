@@ -70,3 +70,37 @@ myvim_down() {
         change_cur_col $down_line
     fi
 }
+
+myvim_enter() {
+    # 处理换行键
+
+    # 声明函数局部变量
+    local first_line=""
+    local second_line=""
+    # 两行的行号
+    local first_row=$((cur_pos_row+1))
+    local second_row=$((cur_pos_row+2))
+
+    # 获取两行内容
+    first_line=${curr_line:0:$cur_pos_col}
+    second_line=${curr_line:$cur_pos_col}
+    if [ -z second_line ]; then
+        # 如果第二行为空，则需要在第一个行后边添加一个空行
+        sed "$"'${first_row} a \n' ${temp_file}
+    else
+        local file_lines=$(cat $temp_file | wc -l)
+        # 将更改写入临时文件
+        sed -i ${first_row}'s/.*/'"${first_line}"'/' ${temp_file}
+        if [ $first_row -lt $file_lines ]; then
+            # 要分行的内容不是最后一行
+            sed -i ${second_row}'i '"${second_line}" ${temp_file}
+        else
+            # 文件末尾多了一行
+            sed -i '$a '"${second_line}" ${temp_file}
+        fi
+    fi
+
+    # 光标移动到下一行的第一个字符
+    cur_pos_row=$((cur_pos_row+1))
+    cur_pos_col=0
+}

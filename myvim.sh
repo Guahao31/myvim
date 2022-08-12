@@ -75,10 +75,10 @@ main_part() {
         else
             case $input in
                 $'\x1b') edit_mode=0    ;; # ESC，退出编辑模式
-                $'\e[A'|$'\e0A') myvim_up   ;; # 上移动
-                $'\e[B'|$'\e0B') myvim_down ;; # 下移动
-                $'\e[C'|$'\e0C') myvim_right;; # 右移动
-                $'\e[D'|$'\e0D') myvim_left ;; # 左移动            
+                $'\e[A'|$'\e0A') myvim_up       ;; # 上移动
+                $'\e[B'|$'\e0B') myvim_down     ;; # 下移动
+                $'\e[C'|$'\e0C') myvim_right    ;; # 右移动
+                $'\e[D'|$'\e0D') myvim_left     ;; # 左移动
                 $'\x7f') # 回退键
                     if [ $cur_pos_col -gt 0 ]; then
                         # 如果光标位置大于1，即光标前仍有字符，则可以进行回退
@@ -86,6 +86,10 @@ main_part() {
                         sed -i $((cur_pos_row+1))'s/.*/'"${modify_line}"'/' ${temp_file}
                         cur_pos_col=$((cur_pos_col-1))
                     fi
+                ;;
+                $'\n') # 换行键
+                    # NOTE: 换行键将cursor前的内容保留到本行，将后边内容插入到下一行
+                    myvim_enter
                 ;;
                 *) # 其他输入
                     # 处理输入
