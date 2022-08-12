@@ -70,6 +70,8 @@ main_part() {
                 k|$'\e[C'|$'\e0C') myvim_right  ;;  # 右移动
                 h|$'\e[A'|$'\e0A') myvim_up     ;;  # 上移动
                 l|$'\e[B'|$'\e0B') myvim_down   ;;  # 下移动
+                g) myvim_home   ;;  # 光标移动到第一行
+                G) myvim_end    ;;  # 光标移动到最后一行
                 i) edit_mode=1  ;;  # 进入编辑模式
                 w) myvim_save   ;;  # 保存
                 q) break        ;;  # 退出

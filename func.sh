@@ -106,6 +106,17 @@ myvim_enter() {
     cur_pos_col=0
 }
 
+myvim_home() {
+    cur_pos_row=0
+    cur_pos_col=0
+}
+
+myvim_end() {
+    local file_lines=$(cat $temp_file | wc -l)
+    cur_pos_row=$((file_lines-1))
+    cur_pos_col=0
+}
+
 myvim_save() {
     # 保存
     cp ${temp_file} ${file_name}
