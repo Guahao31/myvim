@@ -86,7 +86,7 @@ myvim_enter() {
     second_line=${curr_line:$cur_pos_col}
     if [ -z second_line ]; then
         # 如果第二行为空，则需要在第一个行后边添加一个空行
-        sed "$"'${first_row} a \n' ${temp_file}
+        sed -i "$"'${first_row} a \n' ${temp_file}
     else
         local file_lines=$(cat $temp_file | wc -l)
         # 将更改写入临时文件
@@ -108,4 +108,21 @@ myvim_enter() {
 myvim_save() {
     # 保存
     cp ${temp_file} ${file_name}
+}
+
+myvim_del() {
+    # 删除当前行
+    local next_row=$cur_pos_row
+    local file_lines=$(cat $temp_file | wc -l)
+    if [ $((cur_pos_row+1)) -eq $file_lines ]; then
+        # 如果删除最后一行，下边要处理的行要上移
+        next_row=$((cur_pos_row-1))
+    fi
+
+    # 删除
+    sed -i $((cur_pos_row+1))'d' ${temp_file}
+
+    # 重置光标位置
+    cur_pos_row=$next_row
+    cur_pos_col=0
 }

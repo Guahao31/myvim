@@ -69,6 +69,8 @@ main_part() {
                 l|$'\e[B'|$'\e0B') myvim_down   ;;  # 下移动
                 i) edit_mode=1  ;;  # 进入编辑模式
                 w) myvim_save   ;;  # 保存
+                q) break        ;;  # 退出
+                d) myvim_del    ;;  # 删除所在行
                 # NOTE: 待完善，在底部显示错误提示；支持d删除单行
                 # d)
                 # *)
