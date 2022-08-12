@@ -70,3 +70,26 @@ myvim_down() {
         change_cur_col $down_line
     fi
 }
+
+myvim_enter() {
+    # 处理换行键
+
+    # 声明函数局部变量
+    local first_line=""
+    local second_line=""
+    # 两行的行号
+    local first_row=$((cur_pos_row+1))
+    local second_row=$((cur_pos_row+2))
+
+    # 获取两行内容
+    first_line=${curr_line:0:$cur_pos_col}
+    second_line=${curr_line:$cur_pos_col}
+
+    # 将更改写入临时文件
+    sed -i ${first_row}'s/.*/'"${first_line}"'/' ${temp_file}
+    sed -i ${second_row}'i '"${second_line}" ${temp_file}
+
+    # 光标移动到下一行的第一个字符
+    cur_pos_row=$((cur_pos_row+1))
+    cur_pos_col=0
+}
