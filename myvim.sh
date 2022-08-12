@@ -15,10 +15,10 @@ temp_file=.$1.my_tmp
 # 准备建立编辑暂存使用的文件 形式为 file_name.my_tmp
 # 检查当前是否存在暂存文件，如果存在，证明其他myvim正在编辑本文本
 # 报错并退出
-# if [ -e $temp_file ]; then
-#     echo "Some other myvim is editing $file_name."
-#     exit 1
-# fi
+if [ -e $temp_file ]; then
+    echo "Some other myvim is editing $file_name."
+    exit 1
+fi
 
 curr_line="" # 记录光标当前所在的行的内容
 # 如果文件存在，则将内容复制到临时文件中，如果文件不存在，则直接新建一个临时文件
