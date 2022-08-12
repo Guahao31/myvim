@@ -115,7 +115,7 @@ main_part() {
 main_part
 
 # set | tail # 查看文件所有的参数内容
-
+clear
 rm $temp_file # 删除临时文件
 
 tput cvvis # 退出时，恢复光标
