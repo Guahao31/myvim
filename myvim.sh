@@ -37,8 +37,9 @@ cur_pos_col=0
 cur_pos_row=0
 
 tput civis # 取消终端光标的显示
+get_view_bottom
 # 初始打印
-clear; print_page
+clear; print_page "$bottom_msg"
 
 main_part() {
     local edit_mode=0 # 为0时表示正常模式，1为编辑模式
@@ -62,6 +63,8 @@ main_part() {
 
         if [ $edit_mode -eq 0 ]; then
             # 正常模式
+            # 提示信息，文件名，行数，字符数
+            get_view_bottom # 执行后，bottom_msg变为 “"<file_name> <lines>L, <chars>C"”的形式
             case $input in
                 j|$'\e[D'|$'\e0D') myvim_left   ;;  # 左移动
                 k|$'\e[C'|$'\e0C') myvim_right  ;;  # 右移动
@@ -71,9 +74,7 @@ main_part() {
                 w) myvim_save   ;;  # 保存
                 q) break        ;;  # 退出
                 d) myvim_del    ;;  # 删除所在行
-                # NOTE: 待完善，在底部显示错误提示；支持d删除单行
-                # d)
-                # *)
+                *) bottom_msg="$input not supported by myvim";; # 打印错误提示信息
             esac
         else
             case $input in
@@ -101,11 +102,12 @@ main_part() {
                     cur_pos_col=$((cur_pos_col+1)) # 移动光标到下一个字符
                 ;;
             esac
+            bottom_msg="-- INSERT --"
         fi
 
         # 清除屏幕并准备打印文件内容
         clear # 清屏
-        print_page # 打印内容
+        print_page "$bottom_msg" # 打印内容
 
     done
 }

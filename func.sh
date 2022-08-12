@@ -23,6 +23,7 @@ print_page() {
         fi
             ((++curr_row)) # 行数计数器自增1
     done < "$temp_file"
+    print_bottom_line "$1" # 打印底部提示信息
 }
 
 myvim_left() {
@@ -125,4 +126,29 @@ myvim_del() {
     # 重置光标位置
     cur_pos_row=$next_row
     cur_pos_col=0
+}
+
+print_bottom_line() {
+    # 获取终端行数
+    local terminal_rows=$(tput lines)
+    local terminal_cols=$(tput cols)
+    tput sc # 保存当前终端指针位置
+
+    # 打印提示信息
+    tput cup $terminal_rows 0 # 指针移动到最后一行第一个位置
+    echo -n "$1"
+
+    # 打印当前cursor位置信息
+    tput cup $terminal_rows $((terminal_cols-10))
+    echo -n "$((cur_pos_row+1)),$((cur_pos_col+1))"
+
+    tput rc # 恢复之前保存的终端指针位置
+}
+
+get_view_bottom() {
+    # 分别获得目前的行数和字符数
+    local file_lines=$(cat $temp_file | wc -l)
+    local file_chars=$(cat $temp_file | wc -m)
+
+    bottom_msg="\"${file_name}\" ${file_lines}L, ${file_chars}C"
 }
