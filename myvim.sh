@@ -58,6 +58,8 @@ main_part() {
         # 获得目前处理的行内容
         curr_line=$(cat $temp_file | sed -n $((cur_pos_row+1))'p')
 
+        local modify_line="";
+
         if [ $edit_mode -eq 0 ]; then
             # 正常模式
             case $input in
@@ -75,17 +77,17 @@ main_part() {
                 $'\x1b') edit_mode=0    ;; # ESC，退出编辑模式
                 $'\x7f') # 回退键
 
-                    ;;
+                ;;
                 $'\e[A'|$'\e0A') myvim_up   ;; # 上移动
                 $'\e[B'|$'\e0B') myvim_down ;; # 下移动
                 $'\e[C'|$'\e0C') myvim_right;; # 右移动
                 $'\e[D'|$'\e0D') myvim_left ;; # 左移动
                 *) # 其他输入
                     # 处理输入
-                    local modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$cur_pos_col}
-                    sed -i $((cur_pos_row+1))'s/.*/'${modify_line}'/' ${temp_file}
+                    modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$cur_pos_col}
+                    sed -i $((cur_pos_row+1))'s/.*/'"${modify_line}"'/' ${temp_file}
                     cur_pos_col=$((cur_pos_col+1)) # 移动光标到下一个字符
-                    ;;
+                ;;
             esac
         fi
 
