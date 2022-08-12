@@ -75,13 +75,18 @@ main_part() {
         else
             case $input in
                 $'\x1b') edit_mode=0    ;; # ESC，退出编辑模式
-                $'\x7f') # 回退键
-
-                ;;
                 $'\e[A'|$'\e0A') myvim_up   ;; # 上移动
                 $'\e[B'|$'\e0B') myvim_down ;; # 下移动
                 $'\e[C'|$'\e0C') myvim_right;; # 右移动
-                $'\e[D'|$'\e0D') myvim_left ;; # 左移动
+                $'\e[D'|$'\e0D') myvim_left ;; # 左移动            
+                $'\x7f') # 回退键
+                    if [ $cur_pos_col -gt 0 ]; then
+                        # 如果光标位置大于1，即光标前仍有字符，则可以进行回退
+                        modify_line=${curr_line:0:$cur_pos_col-1}${curr_line:$cur_pos_col}
+                        sed -i $((cur_pos_row+1))'s/.*/'"${modify_line}"'/' ${temp_file}
+                        cur_pos_col=$((cur_pos_col-1))
+                    fi
+                ;;
                 *) # 其他输入
                     # 处理输入
                     modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$cur_pos_col}
