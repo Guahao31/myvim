@@ -61,10 +61,10 @@ main_part() {
         if [ $edit_mode -eq 0 ]; then
             # 正常模式
             case $input in
-                j) myvim_left   ;;  # 左移动
-                k) myvim_right  ;;  # 右移动
-                h) myvim_up     ;;  # 上移动
-                l) myvim_down   ;;  # 下移动
+                j|$'\e[D'|$'\e0D') myvim_left   ;;  # 左移动
+                k|$'\e[C'|$'\e0C') myvim_right  ;;  # 右移动
+                h|$'\e[A'|$'\e0A') myvim_up     ;;  # 上移动
+                l|$'\e[B'|$'\e0B') myvim_down   ;;  # 下移动
                 i) edit_mode=1  ;;  # 进入编辑模式
                 # NOTE: 待完善，在底部显示错误提示；支持d删除单行
                 # d)
@@ -76,10 +76,10 @@ main_part() {
                 $'\x7f') # 回退键
 
                     ;;
-                $'\e[A'|$'\e0A') myvim_up   ;; # 上
-                $'\e[B'|$'\e0B') myvim_down ;; # 下
-                $'\e[C'|$'\e0C') myvim_right;; # 右
-                $'\e[D'|$'\e0D') myvim_left ;; # 左
+                $'\e[A'|$'\e0A') myvim_up   ;; # 上移动
+                $'\e[B'|$'\e0B') myvim_down ;; # 下移动
+                $'\e[C'|$'\e0C') myvim_right;; # 右移动
+                $'\e[D'|$'\e0D') myvim_left ;; # 左移动
                 *) # 其他输入
                     # 处理输入
                     local modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$cur_pos_col}
