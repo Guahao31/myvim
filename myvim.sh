@@ -40,38 +40,55 @@ tput civis # 取消终端光标的显示
 # 初始打印
 clear; print_page
 
-edit_mode=0 # 为0时表示正常模式，1为编辑模式
+main_part() {
+    local edit_mode=0 # 为0时表示正常模式，1为编辑模式
 
-# 主体部分，退出前一直循环，每次处理一个字符的输入
-while read -s -N1 input; do
-    # -s 不将用户的输入反映到终端输出；-N1 每次读入1个字符
+    # 主体部分，退出前一直循环，每次处理一个字符的输入
+    while read -s -N1 input; do
+        # -s 不将用户的输入反映到终端输出；-N1 每次读入1个字符
 
-    # 获得目前处理的行内容
-    curr_line=$(cat $temp_file | sed -n $((cur_pos_row+1))'p')
+        # 获得目前处理的行内容
+        curr_line=$(cat $temp_file | sed -n $((cur_pos_row+1))'p')
 
-    if [ $edit_mode -eq 0 ]; then
-        # 正常模式
-        case $input in
-            j) myvim_left ;;
-            k) myvim_right ;;
-            h) myvim_up ;;
-            l) myvim_down ;;
-        esac
-    else
-        # 编辑模式
-        
-        # 处理输入
-        local modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$cur_pos_col}
-        sed -i $((cur_pos_row+1))'s/.*/'${modify_line}'/' ${temp_file}
-        cur_pos_col=$((cur_pos_col+1)) # 移动光标到下一个字符
-    fi
+        if [ $edit_mode -eq 0 ]; then
+            # 正常模式
+            case $input in
+                j) myvim_left   ;;  # 左移动
+                k) myvim_right  ;;  # 右移动
+                h) myvim_up     ;;  # 上移动
+                l) myvim_down   ;;  # 下移动
+                i) edit_mode=1  ;;  # 进入编辑模式
+                # NOTE: 待完善，在底部显示错误提示；支持d删除单行
+                # d)
+                # *)
+            esac
+        else
+            # # 编辑模式
+            # local modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$cur_pos_col}
+            # sed -i $((cur_pos_row+1))'s/.*/'${modify_line}'/' ${temp_file}
+            # cur_pos_col=$((cur_pos_col+1)) # 移动光标到下一个字符
+            case $input in
+                $'\x1b') edit_mode=0    ;; # ESC，退出编辑模式
+                $'\x7f') # 回退键
 
-    # 清除屏幕并准备打印文件内容
-    clear # 清屏
-    print_page # 打印内容
+                    ;;
+                *) # 其他输入
+                    # 处理输入
+                    local modify_line=${curr_line:0:$cur_pos_col}$input${curr_line:$cur_pos_col}
+                    sed -i $((cur_pos_row+1))'s/.*/'${modify_line}'/' ${temp_file}
+                    cur_pos_col=$((cur_pos_col+1)) # 移动光标到下一个字符
+                    ;;
+            esac
+        fi
 
-done
- 
+        # 清除屏幕并准备打印文件内容
+        clear # 清屏
+        print_page # 打印内容
+
+    done
+}
+
+main_part
 
 # set | tail # 查看文件所有的参数内容
 
@@ -79,4 +96,3 @@ rm $temp_file # 删除临时文件
 
 tput cvvis # 退出时，恢复光标
 
-# 检查文件是否存在
