@@ -104,3 +104,8 @@ myvim_enter() {
     cur_pos_row=$((cur_pos_row+1))
     cur_pos_col=0
 }
+
+myvim_save() {
+    # 保存
+    cp ${temp_file} ${file_name}
+}

@@ -68,6 +68,7 @@ main_part() {
                 h|$'\e[A'|$'\e0A') myvim_up     ;;  # 上移动
                 l|$'\e[B'|$'\e0B') myvim_down   ;;  # 下移动
                 i) edit_mode=1  ;;  # 进入编辑模式
+                w) myvim_save   ;;  # 保存
                 # NOTE: 待完善，在底部显示错误提示；支持d删除单行
                 # d)
                 # *)
